@@ -1,9 +1,6 @@
 <?php
-
-
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -14,9 +11,6 @@ use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
  * @ORM\Entity()
  * @ORM\Table(name="family_members")
  */
-#[ApiResource(array(
-    'description' => 'Family members represent user accounts and belong to a family.'
-))]
 class FamilyMember
 {
     /**

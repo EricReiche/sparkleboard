@@ -1,9 +1,6 @@
 <?php
-
-
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -13,9 +10,6 @@ use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
  * @ORM\Entity()
  * @ORM\Table(name="familys")
  */
-#[ApiResource(array(
-    'description' => 'Family contains a set of members sharing resources like categories, tasks and have a common feed.'
-))]
 class Family
 {
     /**
@@ -32,30 +26,6 @@ class Family
      */
     #[Assert\NotBlank]
     public string $name = '';
-
-    /**
-     * @ORM\Column(type="boolean")
-     * Is the 'tasks' feature active for this family?
-     */
-    public bool $tasksActive = true;
-
-    /**
-     * @ORM\Column(type="boolean")
-     * Is the 'rewards' feature active for this family?
-     */
-    public bool $rewardsActive = true;
-
-    /**
-     * @ORM\Column(type="boolean")
-     * Is the 'groceries' feature active for this family?
-     */
-    public bool $groceriesActive = true;
-
-    /**
-     * @ORM\Column(type="boolean")
-     * Is the 'schedule' feature active for this family?
-     */
-    public bool $scheduleActive = true;
 
     /**
      * @ORM\Column(type="datetime_immutable")

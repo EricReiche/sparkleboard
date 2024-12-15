@@ -1,8 +1,6 @@
 <?php
-
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidV4Generator;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -14,9 +12,6 @@ use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
  * @ORM\Entity()
  * @ORM\Table(name="tasks_pool")
  */
-#[ApiResource(array(
-    'description' => 'Parent object for tasks in a feed, can be repeated. Work like an abstract version of feed tasks.'
-))]
 class TasksPool
 {
     /**

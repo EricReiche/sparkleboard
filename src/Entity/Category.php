@@ -1,8 +1,6 @@
 <?php
-
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -13,9 +11,6 @@ use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
  * @ORM\Entity()
  * @ORM\Table(name="categories")
  */
-#[ApiResource(array(
-    'description' => 'Categories are used to group Tasks, each Family has their own'
-))]
 class Category
 {
     /**
