@@ -32,4 +32,41 @@ return [
         'version' => '5.1.0',
         'type' => 'css',
     ],
+    'intl-messageformat' => [
+        'version' => '10.7.10',
+    ],
+    'tslib' => [
+        'version' => '2.8.1',
+    ],
+    '@formatjs/fast-memoize' => [
+        'version' => '2.2.5',
+    ],
+    '@formatjs/icu-messageformat-parser' => [
+        'version' => '2.9.7',
+    ],
+    '@formatjs/icu-skeleton-parser' => [
+        'version' => '1.8.11',
+    ],
+    '@symfony/ux-translator' => [
+        'path' => './vendor/symfony/ux-translator/assets/dist/translator_controller.js',
+    ],
+    '@app/translations' => [
+        'path' => './var/translations/index.js',
+    ],
+    '@app/translations/configuration' => [
+        'path' => './var/translations/configuration.js',
+    ],
+    'tom-select' => [
+        'version' => '2.4.1',
+    ],
+    '@orchidjs/sifter' => [
+        'version' => '1.1.0',
+    ],
+    '@orchidjs/unicode-variants' => [
+        'version' => '1.1.2',
+    ],
+    'tom-select/dist/css/tom-select.default.min.css' => [
+        'version' => '2.4.1',
+        'type' => 'css',
+    ],
 ];
