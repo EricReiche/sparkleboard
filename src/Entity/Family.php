@@ -9,6 +9,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: FamilyRepository::class)]
 class Family
@@ -48,6 +49,12 @@ class Family
      */
     #[ORM\OneToMany(targetEntity: TasksPool::class, mappedBy: 'owner')]
     private Collection $tasksPools;
+
+    
+    
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
+    #[Gedmo\Timestampable]
+    public ?\DateTimeImmutable $updatedAt = null;
 
     public function __construct()
     {

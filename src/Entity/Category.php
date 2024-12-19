@@ -11,6 +11,7 @@ use Symfony\UX\Turbo\Attribute\Broadcast;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
 #[Broadcast]
@@ -49,6 +50,11 @@ class Category
      */
     #[ORM\OneToMany(targetEntity: TasksPool::class, mappedBy: 'Category')]
     private Collection $tasksPools;
+
+    
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
+    #[Gedmo\Timestampable]
+    public ?\DateTimeImmutable $updatedAt = null;
 
     public function __construct()
     {
