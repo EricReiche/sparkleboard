@@ -10,11 +10,13 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
-use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\Timestampable\Traits\TimestampableEntity;
 
 #[ORM\Entity(repositoryClass: FamilyMemberRepository::class)]
 class FamilyMember
 {
+    use TimestampableEntity;
+
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
@@ -47,6 +49,7 @@ class FamilyMember
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $activationCode = null;
 
+    #[Assert\DivisibleBy(1)]
     #[ORM\Column]
     private ?int $pointBalance = 0;
 
@@ -59,15 +62,7 @@ class FamilyMember
     #[ORM\Column]
     private ?bool $isActive = false;
 
-    #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
-
-    
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-    #[Gedmo\Timestampable]
-    public ?\DateTimeImmutable $updatedAt = null;
-
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
     private ?\DateTimeInterface $birthday = null;
 
     #[ORM\ManyToOne(inversedBy: 'familyMembers')]

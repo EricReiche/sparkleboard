@@ -9,11 +9,13 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
-use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\Timestampable\Traits\TimestampableEntity;
 
 #[ORM\Entity(repositoryClass: TasksPoolRepository::class)]
 class TasksPool
 {
+    use TimestampableEntity;
+
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
@@ -69,10 +71,6 @@ class TasksPool
      */
     #[ORM\OneToMany(targetEntity: tasksFeed::class, mappedBy: 'tasksPool')]
     private Collection $tasksFeed;
-    
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-    #[Gedmo\Timestampable]
-    public ?\DateTimeImmutable $updatedAt = null;
 
     public function __construct()
     {

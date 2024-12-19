@@ -11,12 +11,14 @@ use Symfony\UX\Turbo\Attribute\Broadcast;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
-use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\Timestampable\Traits\TimestampableEntity;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
 #[Broadcast]
 class Category
 {
+    use TimestampableEntity;
+
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
@@ -43,23 +45,18 @@ class Category
      * @var Collection<int, TasksFeed>
      */
     #[ORM\OneToMany(targetEntity: TasksFeed::class, mappedBy: 'category')]
-    private Collection $tasksFeeds;
+    private Collection $tasksFeed;
 
     /**
      * @var Collection<int, TasksPool>
      */
     #[ORM\OneToMany(targetEntity: TasksPool::class, mappedBy: 'Category')]
-    private Collection $tasksPools;
-
-    
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-    #[Gedmo\Timestampable]
-    public ?\DateTimeImmutable $updatedAt = null;
+    private Collection $tasksPool;
 
     public function __construct()
     {
-        $this->tasksFeeds = new ArrayCollection();
-        $this->tasksPools = new ArrayCollection();
+        $this->tasksFeed = new ArrayCollection();
+        $this->tasksPool = new ArrayCollection();
     }
 
     public function getId(): ?Uuid
@@ -120,13 +117,13 @@ class Category
      */
     public function getTasksFeeds(): Collection
     {
-        return $this->tasksFeeds;
+        return $this->tasksFeed;
     }
 
     public function addTasksFeed(TasksFeed $tasksFeed): static
     {
-        if (!$this->tasksFeeds->contains($tasksFeed)) {
-            $this->tasksFeeds->add($tasksFeed);
+        if (!$this->tasksFeed->contains($tasksFeed)) {
+            $this->tasksFeed->add($tasksFeed);
             $tasksFeed->setCategory($this);
         }
 
@@ -135,7 +132,7 @@ class Category
 
     public function removeTasksFeed(TasksFeed $tasksFeed): static
     {
-        if ($this->tasksFeeds->removeElement($tasksFeed)) {
+        if ($this->tasksFeed->removeElement($tasksFeed)) {
             // set the owning side to null (unless already changed)
             if ($tasksFeed->getCategory() === $this) {
                 $tasksFeed->setCategory(null);
@@ -150,13 +147,13 @@ class Category
      */
     public function getTasksPools(): Collection
     {
-        return $this->tasksPools;
+        return $this->tasksPool;
     }
 
     public function addTasksPool(TasksPool $tasksPool): static
     {
-        if (!$this->tasksPools->contains($tasksPool)) {
-            $this->tasksPools->add($tasksPool);
+        if (!$this->tasksPool->contains($tasksPool)) {
+            $this->tasksPool->add($tasksPool);
             $tasksPool->setCategory($this);
         }
 
@@ -165,7 +162,7 @@ class Category
 
     public function removeTasksPool(TasksPool $tasksPool): static
     {
-        if ($this->tasksPools->removeElement($tasksPool)) {
+        if ($this->tasksPool->removeElement($tasksPool)) {
             // set the owning side to null (unless already changed)
             if ($tasksPool->getCategory() === $this) {
                 $tasksPool->setCategory(null);
