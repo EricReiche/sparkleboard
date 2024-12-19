@@ -1,25 +1,31 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello HomepageController!{% endblock %}
+{% block title %}Sparkleboard{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
 
-<div class="example-wrapper">
+    <div class="p-5 mb-4 bg-light rounded-3">
+  
+      <div class="row align-items-md-stretch">
+        <div class="col-md-6">
+          <div class="h-100 p-5 text-white bg-light rounded-3">
+            <img src="{{ asset('img/sparkleboard-hero-500.jpg') }}" alt="Sparkleboard logo" />
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="h-100 p-5 bg-light border rounded-3">
 
+            <h2>Sparkleboard is a chore tracking app for families.</h2>
+            <p>It helps you keep track of chores and rewards for your family.</p>
+            <p>It's a great way to teach your kids responsibility and the value of hard work.</p>
+            <p>Sign up today and start tracking your family's chores and rewards!</p>
+            
+            <a href="{{ path('app_homepage') }}" class="btn btn-primary">Sign up now!</a>
+            <a href="{{ path('app_homepage') }}" class="btn btn-secondary">I already have an account</a>
+          </div>
+        </div>
+      </div>
     
-    <h1 data-controller="homepage">Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/home/eric/dev/sparkleboard/src/Controller/HomepageController.php</code></li>
-        <li>Your template at <code>/home/eric/dev/sparkleboard/templates/homepage/index.html.twig</code></li>
-    </ul>
-</div>
-
 {% endblock %}
 
 {% block javascripts%}

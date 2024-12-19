@@ -73,18 +73,18 @@ class FamilyMember
      * @var Collection<int, TasksFeed>
      */
     #[ORM\OneToMany(targetEntity: TasksFeed::class, mappedBy: 'assignee')]
-    private Collection $tasksFeeds;
+    private Collection $tasksFeed;
 
     /**
      * @var Collection<int, TasksPool>
      */
     #[ORM\OneToMany(targetEntity: TasksPool::class, mappedBy: 'assignee')]
-    private Collection $tasksPools;
+    private Collection $tasksPool;
 
     public function __construct()
     {
-        $this->tasksFeeds = new ArrayCollection();
-        $this->tasksPools = new ArrayCollection();
+        $this->tasksFeed = new ArrayCollection();
+        $this->tasksPool = new ArrayCollection();
     }
 
     public function getId(): ?Uuid
@@ -290,13 +290,13 @@ class FamilyMember
      */
     public function getTasksFeeds(): Collection
     {
-        return $this->tasksFeeds;
+        return $this->tasksFeed;
     }
 
     public function addTasksFeed(TasksFeed $tasksFeed): static
     {
-        if (!$this->tasksFeeds->contains($tasksFeed)) {
-            $this->tasksFeeds->add($tasksFeed);
+        if (!$this->tasksFeed->contains($tasksFeed)) {
+            $this->tasksFeed->add($tasksFeed);
             $tasksFeed->setAssignee($this);
         }
 
@@ -305,7 +305,7 @@ class FamilyMember
 
     public function removeTasksFeed(TasksFeed $tasksFeed): static
     {
-        if ($this->tasksFeeds->removeElement($tasksFeed)) {
+        if ($this->tasksFeed->removeElement($tasksFeed)) {
             // set the owning side to null (unless already changed)
             if ($tasksFeed->getAssignee() === $this) {
                 $tasksFeed->setAssignee(null);
@@ -320,13 +320,13 @@ class FamilyMember
      */
     public function getTasksPools(): Collection
     {
-        return $this->tasksPools;
+        return $this->tasksPool;
     }
 
     public function addTasksPool(TasksPool $tasksPool): static
     {
-        if (!$this->tasksPools->contains($tasksPool)) {
-            $this->tasksPools->add($tasksPool);
+        if (!$this->tasksPool->contains($tasksPool)) {
+            $this->tasksPool->add($tasksPool);
             $tasksPool->setAssignee($this);
         }
 
@@ -335,7 +335,7 @@ class FamilyMember
 
     public function removeTasksPool(TasksPool $tasksPool): static
     {
-        if ($this->tasksPools->removeElement($tasksPool)) {
+        if ($this->tasksPool->removeElement($tasksPool)) {
             // set the owning side to null (unless already changed)
             if ($tasksPool->getAssignee() === $this) {
                 $tasksPool->setAssignee(null);

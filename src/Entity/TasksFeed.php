@@ -26,10 +26,10 @@ class TasksFeed
     #[ORM\Column]
     private ?int $points = null;
 
-    #[ORM\ManyToOne(inversedBy: 'tasksFeeds')]
+    #[ORM\ManyToOne(inversedBy: 'tasksFeed')]
     private ?FamilyMember $assignee = null;
 
-    #[ORM\ManyToOne(inversedBy: 'tasksFeeds')]
+    #[ORM\ManyToOne(inversedBy: 'tasksFeed')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Family $owner = null;
 
@@ -48,7 +48,7 @@ class TasksFeed
     #[ORM\Column(nullable: true)]
     private ?int $duration = null;
 
-    #[ORM\ManyToOne(inversedBy: 'tasksFeeds')]
+    #[ORM\ManyToOne(inversedBy: 'tasksFeed')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Category $category = null;
 

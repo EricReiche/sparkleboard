@@ -17,22 +17,24 @@
 
         <main>
             <div class="container">
-                <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
-                <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
-                    <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"/></svg>
-                    <span class="fs-4"><img src="{{ asset('img/logo-100.png') }}" alt="SparkleBoard logo" /></span>
-                </a>
+                    <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+                    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
+                        <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"/></svg>
+                        <span class="fs-4"><img src="{{ asset('img/logo-100.png') }}" alt="SparkleBoard logo" /></span>
+                    </a>
 
-                <ul class="nav nav-pills">
-                    <li class="nav-item"><a href="#" class="nav-link active" aria-current="page">Home</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link">Chores</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link">Points</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link">Family</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link">Settings</a></li>
-                </ul>
-                </header>
+                    <ul class="nav nav-pills">
+                        <li class="nav-item"><a href="{{ path('app_homepage') }}" class="nav-link{% if app.request.attributes.get( '_route' ) starts with 'app_homepage' %} active{% endif %}" aria-current="page">Home</a></li>
+                        <li class="nav-item"><a href="#" class="nav-link">Chores</a></li>
+                        <li class="nav-item"><a href="#" class="nav-link">Points</a></li>
+                        <li class="nav-item"><a href="{{ path('app_family_index') }}" class="nav-link{% if app.request.attributes.get( '_route' ) starts with 'app_family' %} active{% endif %}">Family</a></li>
+                        <li class="nav-item"><a href="#" class="nav-link">Settings</a></li>
+                    </ul>
+                    </header>
+        
+                {% block body %}
+                {% endblock %}
             </div>
         </main>
-        {% block body %}{% endblock %}
     </body>
 </html>

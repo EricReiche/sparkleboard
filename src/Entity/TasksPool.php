@@ -28,7 +28,7 @@ class TasksPool
     #[ORM\Column]
     private ?int $points = null;
 
-    #[ORM\ManyToOne(inversedBy: 'tasksPools')]
+    #[ORM\ManyToOne(inversedBy: 'tasksPool')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Category $Category = null;
 
@@ -38,14 +38,14 @@ class TasksPool
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $image = null;
 
-    #[ORM\ManyToOne(inversedBy: 'tasksPools')]
+    #[ORM\ManyToOne(inversedBy: 'tasksPool')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Family $owner = null;
 
     #[ORM\Column]
     private ?bool $isRepeatable = null;
 
-    #[ORM\ManyToOne(inversedBy: 'tasksPools')]
+    #[ORM\ManyToOne(inversedBy: 'tasksPool')]
     private ?FamilyMember $assignee = null;
 
     #[ORM\Column(length: 2, nullable: true)]
