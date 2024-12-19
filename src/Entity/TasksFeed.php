@@ -1,94 +1,71 @@
 <?php
+
 namespace App\Entity;
 
-use Symfony\Bridge\Doctrine\IdGenerator\UuidV4Generator;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Repository\TasksFeedRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
+use Symfony\Bridge\Doctrine\Types\UuidType;
+use Symfony\Component\Uid\Uuid;
 
-/**
- * @ORM\Entity()
- * @ORM\Table(name="tasks_feed")
- */
+#[ORM\Entity(repositoryClass: TasksFeedRepository::class)]
 class TasksFeed
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="uuid", unique=true)
-     * @ORM\GeneratedValue(strategy="CUSTOM")
-     * @ORM\CustomIdGenerator(class=UuidGenerator::class)
-     */
-    private ?string $uuid;
+    #[ORM\Id]
+    #[ORM\Column(type: UuidType::NAME, unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    private ?Uuid $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    #[Assert\NotBlank]
-    private string $name = '';
+    #[ORM\Column(length: 255)]
+    private ?string $name = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="TasksPool", inversedBy="tasksFeed")
-     * @ORM\JoinColumn(name="tasks_pool_uuid", referencedColumnName="uuid", nullable=true)
-     */
-    private TasksPool $tasksPool;
+    #[ORM\Column]
+    private ?int $points = null;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
-    #[Assert\DivisibleBy(1)]
-    private int $points = 0;
+    #[ORM\ManyToOne(inversedBy: 'tasksFeeds')]
+    private ?FamilyMember $assignee = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="FamilyMember", inversedBy="tasksFeed")
-     * @ORM\JoinColumn(name="assignee", referencedColumnName="uuid", nullable=false)
-     */
-    private ?FamilyMember $assignee;
+    #[ORM\ManyToOne(inversedBy: 'tasksFeeds')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Family $owner = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="Family", inversedBy="tasksFeed")
-     * @ORM\JoinColumn(name="owner_family_uuid", referencedColumnName="uuid")
-     * Family this feedtask belongs to
-     */
-    public ?Family $owner = null;
+    #[ORM\Column]
+    private ?bool $isComplete = null;
 
-    /**
-     * @ORM\Column(type="boolean")
-     */
-    private bool $isComplete = false;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $completedAt = null;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
-    private ?\DateTimeInterface $completedAt;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $scheduledAt = null;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
-    #[Assert\NotBlank]
-    private ?\DateTimeInterface $scheduledAt;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $dueAt = null;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
-    private ?\DateTimeInterface $dueAt;
+    #[ORM\Column(nullable: true)]
+    private ?int $duration = null;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private ?int $duration;
+    #[ORM\ManyToOne(inversedBy: 'tasksFeeds')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Category $category = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="Category", inversedBy="tasksFeed")
-     * @ORM\JoinColumn(name="category_uuid", referencedColumnName="uuid", nullable=false)
-     */
-    private ?Category $category;
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\ManyToOne(inversedBy: 'tasksFeed')]
+    private ?TasksPool $tasksPool = null;
 
 
-    public function getUuid()
+    public function getId(): ?Uuid
     {
-        return $this->uuid;
+        return $this->id;
+    }
+
+    public function setId(Uuid $id): static
+    {
+        $this->id = $id;
+
+        return $this;
     }
 
     public function getName(): ?string
@@ -96,21 +73,9 @@ class TasksFeed
         return $this->name;
     }
 
-    public function setName(string $name): self
+    public function setName(string $name): static
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function getTasksPool(): ?TasksPool
-    {
-        return $this->tasksPool;
-    }
-
-    public function setTasksPool(?TasksPool $tasksPool): self
-    {
-        $this->tasksPool = $tasksPool;
 
         return $this;
     }
@@ -120,7 +85,7 @@ class TasksFeed
         return $this->points;
     }
 
-    public function setPoints(int $points): self
+    public function setPoints(int $points): static
     {
         $this->points = $points;
 
@@ -132,7 +97,7 @@ class TasksFeed
         return $this->assignee;
     }
 
-    public function setAssignee(?FamilyMember $assignee): self
+    public function setAssignee(?FamilyMember $assignee): static
     {
         $this->assignee = $assignee;
 
@@ -144,19 +109,19 @@ class TasksFeed
         return $this->owner;
     }
 
-    public function setOwner(?Family $owner): self
+    public function setOwner(?Family $owner): static
     {
         $this->owner = $owner;
 
         return $this;
     }
 
-    public function getIsComplete(): ?bool
+    public function isComplete(): ?bool
     {
         return $this->isComplete;
     }
 
-    public function setIsComplete(bool $isComplete): self
+    public function setComplete(bool $isComplete): static
     {
         $this->isComplete = $isComplete;
 
@@ -168,7 +133,7 @@ class TasksFeed
         return $this->completedAt;
     }
 
-    public function setCompletedAt(?\DateTimeInterface $completedAt): self
+    public function setCompletedAt(?\DateTimeInterface $completedAt): static
     {
         $this->completedAt = $completedAt;
 
@@ -180,7 +145,7 @@ class TasksFeed
         return $this->scheduledAt;
     }
 
-    public function setScheduledAt(\DateTimeInterface $scheduledAt): self
+    public function setScheduledAt(?\DateTimeInterface $scheduledAt): static
     {
         $this->scheduledAt = $scheduledAt;
 
@@ -192,7 +157,7 @@ class TasksFeed
         return $this->dueAt;
     }
 
-    public function setDueAt(?\DateTimeInterface $dueAt): self
+    public function setDueAt(?\DateTimeInterface $dueAt): static
     {
         $this->dueAt = $dueAt;
 
@@ -204,7 +169,7 @@ class TasksFeed
         return $this->duration;
     }
 
-    public function setDuration(?int $duration): self
+    public function setDuration(?int $duration): static
     {
         $this->duration = $duration;
 
@@ -216,9 +181,33 @@ class TasksFeed
         return $this->category;
     }
 
-    public function setCategory(?Category $category): self
+    public function setCategory(?Category $category): static
     {
         $this->category = $category;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getTasksPool(): ?TasksPool
+    {
+        return $this->tasksPool;
+    }
+
+    public function setTasksPool(?TasksPool $tasksPool): static
+    {
+        $this->tasksPool = $tasksPool;
 
         return $this;
     }

@@ -1,179 +1,313 @@
 <?php
+
 namespace App\Entity;
 
+use App\Repository\FamilyMemberRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
+use Symfony\Bridge\Doctrine\Types\UuidType;
+use Symfony\Component\Uid\Uuid;
 
-/**
- * @ORM\Entity()
- * @ORM\Table(name="family_members")
- */
+#[ORM\Entity(repositoryClass: FamilyMemberRepository::class)]
 class FamilyMember
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="uuid", unique=true)
-     * @ORM\GeneratedValue(strategy="CUSTOM")
-     * @ORM\CustomIdGenerator(class=UuidGenerator::class)
-     */
-    private ?string $uuid;
+    #[ORM\Id]
+    #[ORM\Column(type: UuidType::NAME, unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    private ?Uuid $id;
 
-    /**
-     * @ORM\Column
-     * Firstname or username
-     */
-    #[Assert\NotBlank]
-    public string $name = '';
+    #[ORM\Column(length: 255)]
+    private ?string $name = null;
 
-    /**
-     * @ORM\Column
-     * Display this user in some interfaces with this color
-     */
-    #[Assert\Regex("/^#[0-9a-f]{6}$/i")]
-    public string $color = '#000000';
+    #[ORM\Column(length: 20)]
+    private ?string $color = null;
 
-    /**
-     * @ORM\Column(nullable=true)
-     * Photo or avatar of this user
-     */
-    public ?string $picture = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $picture = null;
 
-    /**
-     * @ORM\Column(nullable=true)
-     * Role of this user in the family (e.g. father, daughter, nanny)
-     */
-    public ?string $role = null;
+    #[ORM\Column(length: 255)]
+    private ?string $role = null;
 
-    /**
-     * @ORM\Column(nullable=true)
-     * Email of this user
-     */
-    public ?string $email = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $email = null;
 
-    /**
-     * @ORM\Column(nullable=true)
-     * Salt for hashing the password
-     */
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $salt = null;
 
-    /**
-     * @ORM\Column(nullable=true)
-     * Hashed password to authenticate the user
-     */
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $password = null;
 
-    /**
-     * @ORM\Column(nullable=true)
-     * Activation code for double opt-in
-     */
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $activationCode = null;
 
-    /**
-     * @ORM\Column(type="smallint")
-     * How many points does this user currently have?
-     */
-    #[Assert\DivisibleBy(1)]
-    public int $pointBalance = 0;
+    #[ORM\Column]
+    private ?int $pointBalance = null;
+
+    #[ORM\Column]
+    private ?bool $isAdmin = null;
+
+    #[ORM\Column]
+    private ?bool $isApprover = null;
+
+    #[ORM\Column]
+    private ?bool $isActive = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $updatedAt = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $birthday = null;
+
+    #[ORM\ManyToOne(inversedBy: 'familyMembers')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Family $Family = null;
 
     /**
-     * @ORM\Column(type="boolean")
-     * Can this user change family settings?
+     * @var Collection<int, TasksFeed>
      */
-    public bool $isAdmin = true;
+    #[ORM\OneToMany(targetEntity: TasksFeed::class, mappedBy: 'assignee')]
+    private Collection $tasksFeeds;
 
     /**
-     * @ORM\Column(type="boolean")
-     * Can this user approve tasks?
+     * @var Collection<int, TasksPool>
      */
-    public bool $isApprover = true;
-
-    /**
-     * @ORM\Column(type="boolean")
-     * Can this user login?
-     */
-    public bool $isActive = true;
-
-    /**
-     * @ORM\Column(type="datetime_immutable")
-     * When was this user first created?
-     */
-    #[Assert\NotNull]
-    private ?\DateTimeInterface $createdAt;
-
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     * What's this user's birthdate?
-     */
-    public ?\DateTimeInterface $birthday = null;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="Family", inversedBy="members")
-     * @ORM\JoinColumn(name="family_uuid", referencedColumnName="uuid")
-     * Family this user belongs to
-     */
-    #[Assert\NotNull]
-    public ?Family $family = null;
-
-    /**
-     * @ORM\OneToMany(targetEntity="TasksPool", mappedBy="assignee")
-     * @ORM\JoinColumn(name="tasks_pool_uuid", referencedColumnName="uuid")
-     */
-    private iterable $tasksPool;
-
-    /**
-     * @ORM\OneToMany(targetEntity="TasksFeed", mappedBy="assignee")
-     * @ORM\JoinColumn(name="tasks_feed_uuid", referencedColumnName="uuid")
-     */
-    private iterable $tasksFeed;
-
-    public function getUuid(): ?string
-    {
-        return $this->uuid;
-    }
+    #[ORM\OneToMany(targetEntity: TasksPool::class, mappedBy: 'assignee')]
+    private Collection $tasksPools;
 
     public function __construct()
     {
-        $this->tasksPool = new ArrayCollection();
-        $this->tasksFeed = new ArrayCollection();
-        $this->createdAt = new \DateTimeImmutable();
+        $this->tasksFeeds = new ArrayCollection();
+        $this->tasksPools = new ArrayCollection();
     }
 
-    /**
-     * @return ?\DateTimeInterface
-     */
-    public function getCreatedAt(): ?\DateTimeInterface
+    public function getId(): ?Uuid
+    {
+        return $this->id;
+    }
+
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): static
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function getColor(): ?string
+    {
+        return $this->color;
+    }
+
+    public function setColor(string $color): static
+    {
+        $this->color = $color;
+
+        return $this;
+    }
+
+    public function getPicture(): ?string
+    {
+        return $this->picture;
+    }
+
+    public function setPicture(?string $picture): static
+    {
+        $this->picture = $picture;
+
+        return $this;
+    }
+
+    public function getRole(): ?string
+    {
+        return $this->role;
+    }
+
+    public function setRole(string $role): static
+    {
+        $this->role = $role;
+
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(?string $email): static
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    public function getSalt(): ?string
+    {
+        return $this->salt;
+    }
+
+    public function setSalt(?string $salt): static
+    {
+        $this->salt = $salt;
+
+        return $this;
+    }
+
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(?string $password): static
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    public function getActivationCode(): ?string
+    {
+        return $this->activationCode;
+    }
+
+    public function setActivationCode(?string $activationCode): static
+    {
+        $this->activationCode = $activationCode;
+
+        return $this;
+    }
+
+    public function getPointBalance(): ?int
+    {
+        return $this->pointBalance;
+    }
+
+    public function setPointBalance(int $pointBalance): static
+    {
+        $this->pointBalance = $pointBalance;
+
+        return $this;
+    }
+
+    public function isAdmin(): ?bool
+    {
+        return $this->isAdmin;
+    }
+
+    public function setAdmin(bool $isAdmin): static
+    {
+        $this->isAdmin = $isAdmin;
+
+        return $this;
+    }
+
+    public function isApprover(): ?bool
+    {
+        return $this->isApprover;
+    }
+
+    public function setApprover(bool $isApprover): static
+    {
+        $this->isApprover = $isApprover;
+
+        return $this;
+    }
+
+    public function isActive(): ?bool
+    {
+        return $this->isActive;
+    }
+
+    public function setActive(bool $isActive): static
+    {
+        $this->isActive = $isActive;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    /**
-     * @var TasksPool[]
-     * @return Collection
-     */
-    public function getTasksPool(): Collection
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
-        return $this->tasksPool;
+        $this->createdAt = $createdAt;
+
+        return $this;
     }
 
-    public function addTasksPool(TasksPool $tasksPool): self
+    public function getUpdatedAt(): ?\DateTimeInterface
     {
-        if (!$this->tasksPool->contains($tasksPool)) {
-            $this->tasksPool[] = $tasksPool;
-            $tasksPool->setAssignee($this);
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(\DateTimeInterface $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getBirthday(): ?\DateTimeInterface
+    {
+        return $this->birthday;
+    }
+
+    public function setBirthday(?\DateTimeInterface $birthday): static
+    {
+        $this->birthday = $birthday;
+
+        return $this;
+    }
+
+    public function getFamily(): ?Family
+    {
+        return $this->Family;
+    }
+
+    public function setFamily(?Family $Family): static
+    {
+        $this->Family = $Family;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, TasksFeed>
+     */
+    public function getTasksFeeds(): Collection
+    {
+        return $this->tasksFeeds;
+    }
+
+    public function addTasksFeed(TasksFeed $tasksFeed): static
+    {
+        if (!$this->tasksFeeds->contains($tasksFeed)) {
+            $this->tasksFeeds->add($tasksFeed);
+            $tasksFeed->setAssignee($this);
         }
 
         return $this;
     }
 
-    public function removeTasksPool(TasksPool $tasksPool): self
+    public function removeTasksFeed(TasksFeed $tasksFeed): static
     {
-        if ($this->tasksPool->removeElement($tasksPool)) {
+        if ($this->tasksFeeds->removeElement($tasksFeed)) {
             // set the owning side to null (unless already changed)
-            if ($tasksPool->getAssignee() === $this) {
-                $tasksPool->setAssignee(null);
+            if ($tasksFeed->getAssignee() === $this) {
+                $tasksFeed->setAssignee(null);
             }
         }
 
@@ -181,19 +315,30 @@ class FamilyMember
     }
 
     /**
-     * @var TasksFeed[]
-     * @return Collection
+     * @return Collection<int, TasksPool>
      */
-    public function getTasksFeed(): Collection
+    public function getTasksPools(): Collection
     {
-        return $this->tasksFeed;
+        return $this->tasksPools;
     }
 
-    public function addTasksFeed(TasksFeed $tasksFeed): self
+    public function addTasksPool(TasksPool $tasksPool): static
     {
-        if (!$this->tasksFeed->contains($tasksFeed)) {
-            $this->tasksFeed[] = $tasksFeed;
-            $tasksFeed->setAssignee($this);
+        if (!$this->tasksPools->contains($tasksPool)) {
+            $this->tasksPools->add($tasksPool);
+            $tasksPool->setAssignee($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTasksPool(TasksPool $tasksPool): static
+    {
+        if ($this->tasksPools->removeElement($tasksPool)) {
+            // set the owning side to null (unless already changed)
+            if ($tasksPool->getAssignee() === $this) {
+                $tasksPool->setAssignee(null);
+            }
         }
 
         return $this;

@@ -1,126 +1,98 @@
 <?php
+
 namespace App\Entity;
 
-use Symfony\Bridge\Doctrine\IdGenerator\UuidV4Generator;
+use App\Repository\TasksPoolRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
+use Symfony\Bridge\Doctrine\Types\UuidType;
+use Symfony\Component\Uid\Uuid;
 
-/**
- * @ORM\Entity()
- * @ORM\Table(name="tasks_pool")
- */
+#[ORM\Entity(repositoryClass: TasksPoolRepository::class)]
 class TasksPool
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="uuid", unique=true)
-     * @ORM\GeneratedValue(strategy="CUSTOM")
-     * @ORM\CustomIdGenerator(class=UuidGenerator::class)
-     */
-    private ?string $uuid;
+    #[ORM\Id]
+    #[ORM\Column(type: UuidType::NAME, unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    private ?Uuid $id;
+
+    #[ORM\Column(length: 255)]
+    private ?string $name = null;
+
+    #[ORM\Column]
+    private ?int $points = null;
+
+    #[ORM\ManyToOne(inversedBy: 'tasksPools')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Category $Category = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $icon = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $image = null;
+
+    #[ORM\ManyToOne(inversedBy: 'tasksPools')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Family $owner = null;
+
+    #[ORM\Column]
+    private ?bool $isRepeatable = null;
+
+    #[ORM\ManyToOne(inversedBy: 'tasksPools')]
+    private ?FamilyMember $assignee = null;
+
+    #[ORM\Column(length: 2, nullable: true)]
+    private ?string $cadence = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $cadenceDay = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $cadenceOverflow = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $lastExecution = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $nextExecution = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $description = null;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @var Collection<int, tasksFeed>
      */
-    #[Assert\NotBlank]
-    private string $name = '';
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    #[Assert\DivisibleBy(1)]
-    private int $points = 0;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="Category", inversedBy="tasksPool")
-     * @ORM\JoinColumn(name="category_uuid", referencedColumnName="uuid", nullable=false)
-     */
-    private ?Category $category;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private ?string $icon;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private ?string $image;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="Family", inversedBy="tasksPool")
-     * @ORM\JoinColumn(name="owner_family_uuid", referencedColumnName="uuid")
-     * Family this pooltask belongs to
-     */
-    public ?Family $owner = null;
-
-    /**
-     * @ORM\Column(type="boolean")
-     */
-    private bool $isRepeatable = false;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="FamilyMember", inversedBy="tasksPool")
-     * @ORM\JoinColumn(name="assignee", referencedColumnName="uuid", nullable=true)
-     */
-    private ?FamilyMember $assignee;
-
-    /**
-     * @ORM\Column(type="string", length=2, nullable=true)
-     */
-    private ?string $cadence;
-
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private ?int $cadenceDay;
-
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private ?bool $cadenceOverflow;
-
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
-    private ?\DateTimeInterface $lastExecution;
-
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
-    private ?\DateTimeInterface $nextExecution;
-
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
-    private ?string $description;
-
-    /**
-     * @ORM\OneToMany(targetEntity="TasksFeed", mappedBy="tasksPool")
-     * @ORM\JoinColumn(name="tasks_feed_uuid", referencedColumnName="uuid", nullable=true)
-     */
-    private iterable $tasksFeed;
+    #[ORM\OneToMany(targetEntity: tasksFeed::class, mappedBy: 'tasksPool')]
+    private Collection $tasksFeed;
 
     public function __construct()
     {
         $this->tasksFeed = new ArrayCollection();
     }
 
-    public function getUuid()
+
+    public function getId(): ?Uuid
     {
-        return $this->uuid;
+        return $this->id;
     }
 
+    public function setId(Uuid $id): static
+    {
+        $this->id = $id;
+
+        return $this;
+    }
 
     public function getName(): ?string
     {
         return $this->name;
     }
 
-    public function setName(string $name): self
+    public function setName(string $name): static
     {
         $this->name = $name;
 
@@ -132,7 +104,7 @@ class TasksPool
         return $this->points;
     }
 
-    public function setPoints(int $points): self
+    public function setPoints(int $points): static
     {
         $this->points = $points;
 
@@ -141,12 +113,12 @@ class TasksPool
 
     public function getCategory(): ?Category
     {
-        return $this->category;
+        return $this->Category;
     }
 
-    public function setCategory(?Category $category): self
+    public function setCategory(?Category $Category): static
     {
-        $this->category = $category;
+        $this->Category = $Category;
 
         return $this;
     }
@@ -156,7 +128,7 @@ class TasksPool
         return $this->icon;
     }
 
-    public function setIcon(?string $icon): self
+    public function setIcon(?string $icon): static
     {
         $this->icon = $icon;
 
@@ -168,7 +140,7 @@ class TasksPool
         return $this->image;
     }
 
-    public function setImage(?string $image): self
+    public function setImage(?string $image): static
     {
         $this->image = $image;
 
@@ -180,19 +152,19 @@ class TasksPool
         return $this->owner;
     }
 
-    public function setOwner(?Family $family): self
+    public function setOwner(?Family $owner): static
     {
-        $this->owner = $family;
+        $this->owner = $owner;
 
         return $this;
     }
 
-    public function getIsRepeatable(): ?bool
+    public function isRepeatable(): ?bool
     {
         return $this->isRepeatable;
     }
 
-    public function setIsRepeatable(bool $isRepeatable): self
+    public function setRepeatable(bool $isRepeatable): static
     {
         $this->isRepeatable = $isRepeatable;
 
@@ -204,7 +176,7 @@ class TasksPool
         return $this->assignee;
     }
 
-    public function setAssignee(?FamilyMember $assignee): self
+    public function setAssignee(?FamilyMember $assignee): static
     {
         $this->assignee = $assignee;
 
@@ -216,7 +188,7 @@ class TasksPool
         return $this->cadence;
     }
 
-    public function setCadence(?string $cadence): self
+    public function setCadence(?string $cadence): static
     {
         $this->cadence = $cadence;
 
@@ -228,19 +200,19 @@ class TasksPool
         return $this->cadenceDay;
     }
 
-    public function setCadenceDay(?int $cadenceDay): self
+    public function setCadenceDay(?int $cadenceDay): static
     {
         $this->cadenceDay = $cadenceDay;
 
         return $this;
     }
 
-    public function getCadenceOverflow(): ?bool
+    public function isCadenceOverflow(): ?bool
     {
         return $this->cadenceOverflow;
     }
 
-    public function setCadenceOverflow(?bool $cadenceOverflow): self
+    public function setCadenceOverflow(?bool $cadenceOverflow): static
     {
         $this->cadenceOverflow = $cadenceOverflow;
 
@@ -252,7 +224,7 @@ class TasksPool
         return $this->lastExecution;
     }
 
-    public function setLastExecution(?\DateTimeInterface $lastExecution): self
+    public function setLastExecution(?\DateTimeInterface $lastExecution): static
     {
         $this->lastExecution = $lastExecution;
 
@@ -264,7 +236,7 @@ class TasksPool
         return $this->nextExecution;
     }
 
-    public function setNextExecution(?\DateTimeInterface $nextExecution): self
+    public function setNextExecution(?\DateTimeInterface $nextExecution): static
     {
         $this->nextExecution = $nextExecution;
 
@@ -276,7 +248,7 @@ class TasksPool
         return $this->description;
     }
 
-    public function setDescription(?string $description): self
+    public function setDescription(?string $description): static
     {
         $this->description = $description;
 
@@ -284,29 +256,29 @@ class TasksPool
     }
 
     /**
-     * @return Collection|TasksFeed[]
+     * @return Collection<int, tasksFeed>
      */
     public function getTasksFeed(): Collection
     {
         return $this->tasksFeed;
     }
 
-    public function addTasksFeed(TasksFeed $tasksFeed): self
+    public function addTasksFeed(tasksFeed $tasksFeed): static
     {
-        if (!$this->tasksFeeds->contains($tasksFeed)) {
-            $this->tasksFeeds[] = $tasksFeed;
-            $tasksFeed->setPoolTask($this);
+        if (!$this->tasksFeed->contains($tasksFeed)) {
+            $this->tasksFeed->add($tasksFeed);
+            $tasksFeed->setTasksPool($this);
         }
 
         return $this;
     }
 
-    public function removeTasksFeed(TasksFeed $tasksFeed): self
+    public function removeTasksFeed(tasksFeed $tasksFeed): static
     {
-        if ($this->tasksFeeds->removeElement($tasksFeed)) {
+        if ($this->tasksFeed->removeElement($tasksFeed)) {
             // set the owning side to null (unless already changed)
-            if ($tasksFeed->getPoolTask() === $this) {
-                $tasksFeed->setPoolTask(null);
+            if ($tasksFeed->getTasksPool() === $this) {
+                $tasksFeed->setTasksPool(null);
             }
         }
 
